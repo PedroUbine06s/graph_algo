@@ -2,9 +2,10 @@
 #include <fstream>
 #include <string>
 #include <queue>
+#include <list>
 #include "class/graph/graph.h"
 
-void breadthFirstSearch(Graph &graph, char start_vertex)
+std::string breadthFirstSearch(Graph &graph, char start_vertex)
 {
     std::vector<Vertex> adjacency_list = graph.getAdjacencyList(start_vertex);
     std::queue<Vertex> queue;
@@ -17,19 +18,15 @@ void breadthFirstSearch(Graph &graph, char start_vertex)
     }
 
     visited[start_vertex] = true;
-    bool is_first = true;
 
     while (!queue.empty())
     {
         Vertex current_vertex = queue.front();
-
         queue.pop();
-        if (current_vertex.getValue() == 'a')
-        {
-            std::cout << std::endl;
-        };
+        output += ", ";
         output += current_vertex.getValue();
         std::vector<Vertex> adjacency_list = graph.getAdjacencyList(current_vertex.getValue());
+
         for (Vertex vertex : adjacency_list)
         {
             if (!visited[vertex.getValue()])
@@ -39,8 +36,25 @@ void breadthFirstSearch(Graph &graph, char start_vertex)
             }
         }
     }
-    std::cout << output;
-    std::cout << std::endl;
+    return output;
+}
+
+std::string depthFirstSearch(Graph &Graph, char start_vertex, std::map<char, bool> &visited, std::string output)
+{
+    std::vector<Vertex> adjacency_list = Graph.getAdjacencyList(start_vertex);
+    visited[start_vertex] = true;
+    ;
+    output += start_vertex;
+    output += ", ";
+
+    for (Vertex vertex : adjacency_list)
+    {
+        if (!visited[vertex.getValue()])
+        {
+            output = depthFirstSearch(Graph, vertex.getValue(), visited, output);
+        }
+    }
+    return output;
 }
 
 void readFile(Graph &graph, std::string filename, bool isDirected)
@@ -85,9 +99,22 @@ void readFile(Graph &graph, std::string filename, bool isDirected)
 
 int main()
 {
-    Graph graph;
-    readFile(graph, "graphs/g1.txt", false);
-    graph.orderInLexicographicOrder();
-    breadthFirstSearch(graph, 'b');
+    Graph graph1;
+    readFile(graph1, "graphs/g1.txt", false);
+    graph1.orderInLexicographicOrder();
+
+    Graph graph2;
+    readFile(graph2, "graphs/g2.txt", true);
+    graph2.orderInLexicographicOrder();
+    std::map<char, bool> visitedDFS;
+
+    std::cout << "BUSCA EM LARGURA" << std::endl;
+    std::cout << "Fazendo busca em largura a partir do vertice 'b': ";
+    std::cout << breadthFirstSearch(graph1, 'b') << std::endl;
+
+    std::cout << "\nBUSCA EM PROFUNDIDADE" << std::endl;
+    std::cout << "Fazendo busca em profundidade a partir do vertice 'a': ";
+    std::cout << depthFirstSearch(graph2, 'a', visitedDFS, "") << std::endl;
+
     return 0;
 }
