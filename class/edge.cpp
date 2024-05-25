@@ -1,10 +1,11 @@
 #include "edge.h"
 
-Edge::Edge(char start, char end, int weight)
+Edge::Edge(char start, char end, int weight, int id)
 {
     this->start = start;
     this->end = end;
     this->weight = weight;
+    this->id = id;
 }
 
 // Getters

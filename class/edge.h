@@ -6,9 +6,10 @@ class Edge
     char start;
     char end;
     int weight;
+    int id;
 
 public:
-    Edge(char start, char end, int weight);
+    Edge(char start, char end, int weight, int id);
     char getStart();
     char getEnd();
     int getWeight();
