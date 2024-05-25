@@ -1,15 +1,11 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
-#include "class/graph.h"
+#include "class/graph/graph.h"
 
 void readFile(Graph &graph, std::string filename)
 {
-    std::ifstream file(filename);
-    char start, end;
-    int weight;
-    int id;
+    std::ifstream file;
+    file.open(filename);
     if (!file.is_open())
     {
         std::cout << "Error opening file" << std::endl;
@@ -18,33 +14,22 @@ void readFile(Graph &graph, std::string filename)
     std::string line;
     while (std::getline(file, line))
     {
-        start = line[0];
-        end = line[2];
-        if (line.size() > 5)
-            weight = line[5];
-        else
-            weight = 0;
-        id = graph.getNumEdges() + 1;
-        graph.addEdge(Edge(start, end, weight, id));
+        char origin_vertex = line[0];
+        char destiny_vertex_char = line[2];
+        Vertex destiny_vertex(destiny_vertex_char);
+        if (line.size() > 4)
+        {
+            destiny_vertex.setWeight(line[4]);
+        }
+        graph.addEdge(origin_vertex, destiny_vertex);
     }
     file.close();
 }
 
 int main()
 {
-    std::vector<Graph> graphs(3);
-    std::vector<std::string> fileNames = {"graphs/g1.txt", "graphs/g2.txt", "graphs/g3.txt"};
-
-    for (int i = 0; i < graphs.size(); i++)
-    {
-        readFile(graphs[i], fileNames[i]);
-    }
-    graphs[0].printGraph();
-    std::cout << "----------------" << std::endl;
-    graphs[1].printGraph();
-    std::cout << "----------------" << std::endl;
-    graphs[2].printGraph();
-    std::cout << "----------------" << std::endl;
-
+    Graph graph;
+    readFile(graph, "graphs/g1.txt");
+    std::cout << "Graph created" << std::endl;
     return 0;
 }
