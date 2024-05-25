@@ -27,7 +27,15 @@ void readFile(Graph &graph, std::string filename, bool isDirected)
         graph.addEdge(origin_vertex, destiny_vertex);
         if (!isDirected)
         {
+
             Vertex origin_vertex_obj(origin_vertex);
+            if (line.size() > 4)
+            {
+                std::string weight_str = line.substr(4, line.find(';') - 4);
+                int weight_int = std::stoi(weight_str);
+                origin_vertex_obj.setWeight(weight_int);
+            }
+
             graph.addEdge(destiny_vertex_char, origin_vertex_obj);
         }
     }
