@@ -11,5 +11,8 @@ private:
 
 public:
     void addEdge(char vertex, Vertex destiny_vertex);
+    std::vector<Vertex> getAdjacencyList(char key);
+    void orderInLexicographicOrder();
+    Vertex getVertex(char key);
 };
 #endif

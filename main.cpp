@@ -1,7 +1,47 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <queue>
 #include "class/graph/graph.h"
+
+void breadthFirstSearch(Graph &graph, char start_vertex)
+{
+    std::vector<Vertex> adjacency_list = graph.getAdjacencyList(start_vertex);
+    std::queue<Vertex> queue;
+    std::map<char, bool> visited;
+    std::string output(1, start_vertex);
+    for (int i = 0; i < adjacency_list.size(); i++)
+    {
+        queue.push(adjacency_list[i]);
+        visited[adjacency_list[i].getValue()] = true;
+    }
+
+    visited[start_vertex] = true;
+    bool is_first = true;
+
+    while (!queue.empty())
+    {
+        Vertex current_vertex = queue.front();
+
+        queue.pop();
+        if (current_vertex.getValue() == 'a')
+        {
+            std::cout << std::endl;
+        };
+        output += current_vertex.getValue();
+        std::vector<Vertex> adjacency_list = graph.getAdjacencyList(current_vertex.getValue());
+        for (Vertex vertex : adjacency_list)
+        {
+            if (!visited[vertex.getValue()])
+            {
+                queue.push(vertex);
+                visited[vertex.getValue()] = true;
+            }
+        }
+    }
+    std::cout << output;
+    std::cout << std::endl;
+}
 
 void readFile(Graph &graph, std::string filename, bool isDirected)
 {
@@ -47,6 +87,7 @@ int main()
 {
     Graph graph;
     readFile(graph, "graphs/g1.txt", false);
-    std::cout << "Graph created" << std::endl;
+    graph.orderInLexicographicOrder();
+    breadthFirstSearch(graph, 'b');
     return 0;
 }
