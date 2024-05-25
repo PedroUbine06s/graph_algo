@@ -44,3 +44,8 @@ int Graph::calculateNumVertices()
 
     return vertices.size();
 }
+
+int Graph::getNumEdges()
+{
+    return this->numEdges;
+}

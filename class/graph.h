@@ -13,6 +13,7 @@ public:
     Graph();
     void addEdge(Edge edge);
     void printGraph();
+    int getNumEdges();
 
 private:
     int calculateNumVertices();
