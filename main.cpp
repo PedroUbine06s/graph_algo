@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "class/graph/graph.h"
 
-void readFile(Graph &graph, std::string filename)
+void readFile(Graph &graph, std::string filename, bool isDirected)
 {
     std::ifstream file;
     file.open(filename);
@@ -19,9 +20,16 @@ void readFile(Graph &graph, std::string filename)
         Vertex destiny_vertex(destiny_vertex_char);
         if (line.size() > 4)
         {
-            destiny_vertex.setWeight(line[4]);
+            std::string weight_str = line.substr(4, line.find(';') - 4);
+            int weight_int = std::stoi(weight_str);
+            destiny_vertex.setWeight(weight_int);
         }
         graph.addEdge(origin_vertex, destiny_vertex);
+        if (!isDirected)
+        {
+            Vertex origin_vertex_obj(origin_vertex);
+            graph.addEdge(destiny_vertex_char, origin_vertex_obj);
+        }
     }
     file.close();
 }
@@ -29,7 +37,7 @@ void readFile(Graph &graph, std::string filename)
 int main()
 {
     Graph graph;
-    readFile(graph, "graphs/g1.txt");
+    readFile(graph, "graphs/g3.txt", false);
     std::cout << "Graph created" << std::endl;
     return 0;
 }
