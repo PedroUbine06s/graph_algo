@@ -18,18 +18,19 @@ void readFile(Graph &graph, std::string filename, bool isDirected)
         char origin_vertex = line[0];
         char destiny_vertex_char = line[2];
         Vertex destiny_vertex(destiny_vertex_char);
-        if (line.size() > 4)
+        if (line.size() > 5)
         {
             std::string weight_str = line.substr(4, line.find(';') - 4);
             int weight_int = std::stoi(weight_str);
             destiny_vertex.setWeight(weight_int);
         }
         graph.addEdge(origin_vertex, destiny_vertex);
+
         if (!isDirected)
         {
 
             Vertex origin_vertex_obj(origin_vertex);
-            if (line.size() > 4)
+            if (line.size() > 5)
             {
                 std::string weight_str = line.substr(4, line.find(';') - 4);
                 int weight_int = std::stoi(weight_str);
@@ -45,7 +46,7 @@ void readFile(Graph &graph, std::string filename, bool isDirected)
 int main()
 {
     Graph graph;
-    readFile(graph, "graphs/g3.txt", false);
+    readFile(graph, "graphs/g1.txt", false);
     std::cout << "Graph created" << std::endl;
     return 0;
 }
