@@ -16,6 +16,7 @@ Vertex Graph::getVertex(char key)
 {
     return this->adjacency_list[key][0];
 }
+
 void Graph::orderInLexicographicOrder()
 {
     for (std::pair<const char, std::vector<Vertex>> &pair : this->adjacency_list)
@@ -33,4 +34,14 @@ void Graph::orderInLexicographicOrder()
             }
         }
     }
+}
+
+std::vector<char> Graph::getVertices()
+{
+    std::vector<char> keys;
+    for (const auto &pair : adjacency_list)
+    {
+        keys.push_back(pair.first);
+    }
+    return keys;
 }

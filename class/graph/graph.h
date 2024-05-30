@@ -14,5 +14,6 @@ public:
     std::vector<Vertex> getAdjacencyList(char key);
     void orderInLexicographicOrder();
     Vertex getVertex(char key);
+    std::vector<char> getVertices();
 };
 #endif

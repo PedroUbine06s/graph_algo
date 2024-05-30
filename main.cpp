@@ -57,6 +57,47 @@ std::string depthFirstSearch(Graph &Graph, char start_vertex, std::map<char, boo
     return output;
 }
 
+void djkstra(Graph &graph, char start_vertex, char objective_vertex)
+{
+    std::vector<Vertex> adjacency_list = graph.getAdjacencyList(start_vertex);
+    std::map<char, int> distances;
+    std::map<char, char> previous;
+    std::map<char, bool> visited;
+    std::list<char> list;
+    for (char vertex : graph.getVertices())
+    {
+        distances[vertex] = INT64_MAX;
+        previous[vertex] = ' ';
+        visited[vertex] = false;
+    }
+    for (auto vertex : adjacency_list)
+    {
+        distances[vertex.getValue()] = vertex.getWeight();
+        previous[vertex.getValue()] = start_vertex;
+        list.push_back(vertex.getValue());
+    }
+    distances[start_vertex] = 0;
+
+    while (!list.empty())
+    {
+        char current_vertex = list.front();
+        list.pop_front();
+        std::vector<Vertex> adjacency_list = graph.getAdjacencyList(current_vertex);
+        for (Vertex vertex : adjacency_list)
+        {
+            if (!visited[vertex.getValue()])
+            {
+                int new_distance = distances[current_vertex] + vertex.getWeight();
+                if (new_distance < distances[vertex.getValue()])
+                {
+                    distances[vertex.getValue()] = new_distance;
+                    previous[vertex.getValue()] = current_vertex;
+                }
+            }
+        }
+    }
+}
+
 void readFile(Graph &graph, std::string filename, bool isDirected)
 {
     std::ifstream file;
@@ -108,6 +149,9 @@ int main()
     graph2.orderInLexicographicOrder();
     std::map<char, bool> visitedDFS;
 
+    Graph graph3;
+    readFile(graph3, "graphs/g3.txt", false);
+
     std::cout << "BUSCA EM LARGURA" << std::endl;
     std::cout << "Fazendo busca em largura a partir do vertice 'b': ";
     std::cout << breadthFirstSearch(graph1, 'b') << std::endl;
@@ -115,6 +159,10 @@ int main()
     std::cout << "\nBUSCA EM PROFUNDIDADE" << std::endl;
     std::cout << "Fazendo busca em profundidade a partir do vertice 'a': ";
     std::cout << depthFirstSearch(graph2, 'a', visitedDFS, "") << std::endl;
+
+    std::cout << "\nDIJKSTRA" << std::endl;
+    std::cout << "Fazendo dijkstra para encontrar menor caminho entre 'x' e 't': ";
+    djkstra(graph3, 'x', 't');
 
     return 0;
 }
