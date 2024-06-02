@@ -2,8 +2,10 @@
 #include <iostream>
 #include <vector>
 
+// Função para adicionar uma aresta no grafo
 void Graph::addEdge(char vertex, Vertex destiny_vertex)
 {
+    // Se o vertice não existe no grafo, ele é adicionado
     this->adjacency_list[vertex].push_back(destiny_vertex);
 }
 
@@ -17,6 +19,7 @@ Vertex Graph::getVertex(char key)
     return this->adjacency_list[key][0];
 }
 
+// Função para ordenar a lista de adjacência em ordem lexicográfica
 void Graph::orderInLexicographicOrder()
 {
     for (std::pair<const char, std::vector<Vertex>> &pair : this->adjacency_list)
@@ -36,6 +39,7 @@ void Graph::orderInLexicographicOrder()
     }
 }
 
+// Função para retornar os vertices do grafo, pois pega as chaves do mapa
 std::vector<char> Graph::getVertices()
 {
     std::vector<char> keys;

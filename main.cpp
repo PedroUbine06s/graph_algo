@@ -5,30 +5,39 @@
 #include <list>
 #include "class/graph/graph.h"
 
+// Função para fazer a busca em largura
 std::string breadthFirstSearch(Graph &graph, char start_vertex)
 {
     std::vector<Vertex> adjacency_list = graph.getAdjacencyList(start_vertex);
     std::queue<Vertex> queue;
+    // Mapa para guardar os vertices visitados
     std::map<char, bool> visited;
     std::string output(1, start_vertex);
+    // Adiciona os vertices adjacentes na fila inicial
     for (int i = 0; i < adjacency_list.size(); i++)
     {
         queue.push(adjacency_list[i]);
         visited[adjacency_list[i].getValue()] = true;
     }
-
+    // Marca o vertice inicial como visitado
     visited[start_vertex] = true;
 
     while (!queue.empty())
     {
+        // Pega o vertice atual da fila e desenfileira
         Vertex current_vertex = queue.front();
         queue.pop();
+
         output += ", ";
         output += current_vertex.getValue();
+
+        // Pega os vertices adjacentes ao vertice atual
         std::vector<Vertex> adjacency_list = graph.getAdjacencyList(current_vertex.getValue());
 
+        // Adiciona os vertices adjacentes na fila
         for (Vertex vertex : adjacency_list)
         {
+            // Se o vertice não foi visitado, ele é adicionado na fila
             if (!visited[vertex.getValue()])
             {
                 queue.push(vertex);
@@ -38,7 +47,7 @@ std::string breadthFirstSearch(Graph &graph, char start_vertex)
     }
     return output;
 }
-
+// Função recursiva para fazer a busca em profundidade
 std::string depthFirstSearch(Graph &Graph, char start_vertex, std::map<char, bool> &visited, std::string output)
 {
     std::vector<Vertex> adjacency_list = Graph.getAdjacencyList(start_vertex);
@@ -49,11 +58,13 @@ std::string depthFirstSearch(Graph &Graph, char start_vertex, std::map<char, boo
 
     for (Vertex vertex : adjacency_list)
     {
+        // Se o vertice não foi visitado, ele chama a função recursivamente
         if (!visited[vertex.getValue()])
         {
             output = depthFirstSearch(Graph, vertex.getValue(), visited, output);
         }
     }
+    // Retorna a string com os vertices visitados para ser impressa
     return output;
 }
 
@@ -97,7 +108,7 @@ void djkstra(Graph &graph, char start_vertex, char objective_vertex)
         }
     }
 }
-
+// Funcão para ler o arquivo e montar o grafo, se o grafo for direcionado, ele adiciona a aresta de volta
 void readFile(Graph &graph, std::string filename, bool isDirected)
 {
     std::ifstream file;
@@ -113,6 +124,7 @@ void readFile(Graph &graph, std::string filename, bool isDirected)
         char origin_vertex = line[0];
         char destiny_vertex_char = line[2];
         Vertex destiny_vertex(destiny_vertex_char);
+        // Se a linha tiver mais de 5 caracteres, significa que tem um peso e ele é adicionado
         if (line.size() > 5)
         {
             std::string weight_str = line.substr(4, line.find(';') - 4);
