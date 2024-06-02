@@ -129,8 +129,10 @@ std::map<char, char> initPrevius(Graph graph)
     }
     return previus;
 };
+// Algorigtmo de djkstra recursivo
 bool djkstraAlgo(Graph &graph, std::map<char, int> &distance, std::map<char, bool> &visited, std::map<char, char> &previus, char stopVertex, char startVertex)
 {
+    // Quando o vertice de inicio é igual ao vertice de parada, retornamos true pois encontramos o menor caminho
     if (startVertex == stopVertex)
     {
         return true;
@@ -139,21 +141,30 @@ bool djkstraAlgo(Graph &graph, std::map<char, int> &distance, std::map<char, boo
     std::vector<Vertex> adjancency_vertex = graph.getAdjacencyList(startVertex);
     for (Vertex v : adjancency_vertex)
     {
+        // Se o vertice já foi visitado, ele é ignorado
         if (visited[v.getValue()])
             continue;
-        // Se for -1 automaticamento guardamos o valor, mas se não validamos se o seu peso +
+        // Soma a distancia do vertice atual com o peso da aresta
         int distance_sum = distance[startVertex] + v.getWeight();
+        // Se a distancia do vertice atual é -1 ou a distancia somada é menor que a distancia atual, a distancia é atualizada
         if (distance[v.getValue()] == -1 || distance_sum < distance[v.getValue()])
         {
+            // Se a distancia do vertice atual é -1, ele é transformado em 0 para poder somar com o peso da aresta
             int transformed = distance[v.getValue()] == -1 ? 0 : distance[v.getValue()];
+            // Atualiza a distancia do vertice, somando a distancia do vertice atual com o peso da aresta
             updateDistance(distance, v.getValue(), transformed + v.getWeight() + distance[startVertex]);
+            // Atualiza o mapa de vertices previos para guardar o caminho
             previus[v.getValue()] = startVertex;
         }
     }
+    // Marca o vertice atual como visitado
     visited[startVertex] = true;
+    // Pega o vertice com o menor caminho que ainda não foi visitado
     Vertex shortest_vertex = getShortestNonVisetedPath(adjancency_vertex, distance, visited);
+    // Se não houver vertice com menor caminho, retorna false
     return djkstraAlgo(graph, distance, visited, previus, stopVertex, shortest_vertex.getValue());
 }
+
 std::string printPath(std::map<char, char> previus, char start, char end)
 {
     std::string path = "";
