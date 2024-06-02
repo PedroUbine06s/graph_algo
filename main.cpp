@@ -48,9 +48,9 @@ std::string breadthFirstSearch(Graph &graph, char start_vertex)
     return output;
 }
 // Função recursiva para fazer a busca em profundidade
-std::string depthFirstSearch(Graph &Graph, char start_vertex, std::map<char, bool> &visited, std::string output)
+std::string depthFirstSearch(Graph &graph, char start_vertex, std::map<char, bool> &visited, std::string output)
 {
-    std::vector<Vertex> adjacency_list = Graph.getAdjacencyList(start_vertex);
+    std::vector<Vertex> adjacency_list = graph.getAdjacencyList(start_vertex);
     visited[start_vertex] = true;
     ;
     output += start_vertex;
@@ -61,52 +61,110 @@ std::string depthFirstSearch(Graph &Graph, char start_vertex, std::map<char, boo
         // Se o vertice não foi visitado, ele chama a função recursivamente
         if (!visited[vertex.getValue()])
         {
-            output = depthFirstSearch(Graph, vertex.getValue(), visited, output);
+            output = depthFirstSearch(graph, vertex.getValue(), visited, output);
         }
     }
     // Retorna a string com os vertices visitados para ser impressa
     return output;
 }
 
-void djkstra(Graph &graph, char start_vertex, char objective_vertex)
+std::map<char, int> initDistance(Graph graph, char start_vertex)
 {
-    std::vector<Vertex> adjacency_list = graph.getAdjacencyList(start_vertex);
-    std::map<char, int> distances;
-    std::map<char, char> previous;
-    std::map<char, bool> visited;
-    std::list<char> list;
-    for (char vertex : graph.getVertices())
+    std::map<char, int> distance;
+    std::vector<char> vertices = graph.getVertices();
+    for (char vertex : vertices)
     {
-        distances[vertex] = INT64_MAX;
-        previous[vertex] = ' ';
+        distance[vertex] = -1;
+    }
+    distance[start_vertex] = 0;
+    return distance;
+};
+
+std::map<char, bool> initVisited(Graph graph, char start_vertex)
+{
+    std::map<char, bool> visited;
+    std::vector<char> vertices = graph.getVertices();
+    for (char vertex : vertices)
+    {
         visited[vertex] = false;
     }
-    for (auto vertex : adjacency_list)
-    {
-        distances[vertex.getValue()] = vertex.getWeight();
-        previous[vertex.getValue()] = start_vertex;
-        list.push_back(vertex.getValue());
-    }
-    distances[start_vertex] = 0;
+    visited[start_vertex] = true;
+    return visited;
+};
 
-    while (!list.empty())
+// Função para atualizar a distancia de um vertice
+void updateDistance(std::map<char, int> &distance, char vertex, int new_distance)
+{
+    if (distance[vertex] == -1 || distance[vertex] > new_distance)
     {
-        char current_vertex = list.front();
-        list.pop_front();
-        std::vector<Vertex> adjacency_list = graph.getAdjacencyList(current_vertex);
-        for (Vertex vertex : adjacency_list)
+        distance[vertex] = new_distance;
+    }
+}
+
+Vertex getShortestNonVisetedPath(std::vector<Vertex> adjacency_vertex, std::map<char, int> distance, std::map<char, bool> visited)
+{
+    Vertex shortest_vertex;
+    int shortest_distance = -1;
+    for (Vertex vertex : adjacency_vertex)
+    {
+        if (!visited[vertex.getValue()])
         {
-            if (!visited[vertex.getValue()])
+            if (shortest_distance == -1 || distance[vertex.getValue()] < shortest_distance)
             {
-                int new_distance = distances[current_vertex] + vertex.getWeight();
-                if (new_distance < distances[vertex.getValue()])
-                {
-                    distances[vertex.getValue()] = new_distance;
-                    previous[vertex.getValue()] = current_vertex;
-                }
+                shortest_distance = distance[vertex.getValue()];
+                shortest_vertex = vertex;
             }
         }
     }
+    return shortest_vertex;
+}
+
+std::map<char, char> initPrevius(Graph graph)
+{
+    std::map<char, char> previus;
+    std::vector<char> vertices = graph.getVertices();
+    for (char vertex : vertices)
+    {
+        previus[vertex] = ' ';
+    }
+    return previus;
+};
+bool djkstraAlgo(Graph &graph, std::map<char, int> &distance, std::map<char, bool> &visited, std::map<char, char> &previus, char stopVertex, char startVertex)
+{
+    if (startVertex == stopVertex)
+    {
+        return true;
+    }
+
+    std::vector<Vertex> adjancency_vertex = graph.getAdjacencyList(startVertex);
+    for (Vertex v : adjancency_vertex)
+    {
+        if (visited[v.getValue()])
+            continue;
+        // Se for -1 automaticamento guardamos o valor, mas se não validamos se o seu peso +
+        int distance_sum = distance[startVertex] + v.getWeight();
+        if (distance[v.getValue()] == -1 || distance_sum < distance[v.getValue()])
+        {
+            int transformed = distance[v.getValue()] == -1 ? 0 : distance[v.getValue()];
+            updateDistance(distance, v.getValue(), transformed + v.getWeight() + distance[startVertex]);
+            previus[v.getValue()] = startVertex;
+        }
+    }
+    visited[startVertex] = true;
+    Vertex shortest_vertex = getShortestNonVisetedPath(adjancency_vertex, distance, visited);
+    return djkstraAlgo(graph, distance, visited, previus, stopVertex, shortest_vertex.getValue());
+}
+std::string printPath(std::map<char, char> previus, char start, char end)
+{
+    std::string path = "";
+    char current_vertex = end;
+    while (current_vertex != start)
+    {
+        path = current_vertex + path;
+        current_vertex = previus[current_vertex];
+    }
+    path = current_vertex + path;
+    return path;
 }
 // Funcão para ler o arquivo e montar o grafo, se o grafo for direcionado, ele adiciona a aresta de volta
 void readFile(Graph &graph, std::string filename, bool isDirected)
@@ -152,6 +210,7 @@ void readFile(Graph &graph, std::string filename, bool isDirected)
 
 int main()
 {
+
     Graph graph1;
     readFile(graph1, "graphs/g1.txt", false);
     graph1.orderInLexicographicOrder();
@@ -163,6 +222,11 @@ int main()
 
     Graph graph3;
     readFile(graph3, "graphs/g3.txt", false);
+    std::map<char, int> distance = initDistance(graph3, 'x');
+    std::map<char, bool> visited = initVisited(graph3, 'x');
+    std::map<char, char> previus = initPrevius(graph3);
+    djkstraAlgo(graph3, distance, visited, previus, 't', 'x');
+    std::string path = printPath(previus, 'x', 't');
 
     std::cout << "BUSCA EM LARGURA" << std::endl;
     std::cout << "Fazendo busca em largura a partir do vertice 'b': ";
@@ -172,9 +236,9 @@ int main()
     std::cout << "Fazendo busca em profundidade a partir do vertice 'a': ";
     std::cout << depthFirstSearch(graph2, 'a', visitedDFS, "") << std::endl;
 
-    std::cout << "\nDIJKSTRA" << std::endl;
-    std::cout << "Fazendo dijkstra para encontrar menor caminho entre 'x' e 't': ";
-    djkstra(graph3, 'x', 't');
-
+    std::cout << "\nDJKSTRA" << std::endl;
+    std::cout << "Fazendo o algo de djkstra para encontrar o menor caminho entre 'x' e 't'" << std::endl;
+    std::cout << "Distancia do menor caminho: " << distance['t'] << std::endl;
+    std::cout << "Caminho: " << path << std::endl;
     return 0;
 }

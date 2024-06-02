@@ -8,7 +8,7 @@ private:
     int weight;
 
 public:
-    Vertex(char value, int weight = 0);
+    Vertex(char value = ' ', int weight = 0);
     char getValue();
     int getWeight();
     void setWeight(int weight);

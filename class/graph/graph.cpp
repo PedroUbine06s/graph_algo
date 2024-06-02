@@ -39,7 +39,7 @@ void Graph::orderInLexicographicOrder()
     }
 }
 
-// Função para retornar os vertices do grafo, pois pega as chaves do mapa
+// Função para retornar todos os vertices do grafo,
 std::vector<char> Graph::getVertices()
 {
     std::vector<char> keys;
